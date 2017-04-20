@@ -21,7 +21,14 @@ public class Juego extends JPanel implements MouseListener{
 
 	
 	//CONSTRUCTORES
-
+	/**
+	 * Este es el único constructor, permite crear un nuevo tablero de juego indicando el número de
+	 * fichas que tendrá, tanto en horizontal como en vertical
+	 * 
+	 * @param h Numero de fichas horizontales
+	 * @param v Numero de fichas verticales
+	 * @throws RuntimeException Si alguna de las dimensiones del tablero es inferior a 2
+	 */
 	public Juego(int h, int v) throws RuntimeException{
 		if(h<2 || v<2) throw new RuntimeException("El tablero tiene que ser al menos de 2*2");
 		this.h = h;
@@ -31,13 +38,22 @@ public class Juego extends JPanel implements MouseListener{
 		this.addMouseListener(this);
 	}
 	
-
+	/**
+	 * Este método debe ser llamado por el constructor, sirve para dimensionar el panel que
+	 * contendrá las fichas.
+	 */
 	private void iniciarTablero(){
 		int ancho=SEPARACION_FICHA*(h+1)+ANCHO_FICHA*h;
 		int alto=SEPARACION_FICHA*(v+1)+ALTO_FICHA*v;
 		this.setPreferredSize( new Dimension(ancho,alto) );
 	}
-
+	/**
+	 * Este método es llamado por el constructor pero debe llamarse también cada vez que se
+	 * desee generar un juego nuevo.
+	 * <br>
+	 * No permite cambiar el numero de fichas, solo vuelve a crearlas y a colocarlas de 
+	 * forma aleatoria.
+	 */
 	private void iniciarFichas(){
 		fichas = new Ficha[h][v];
 		ArrayList<Ficha> _fichas = new ArrayList<Ficha>(h*v);
@@ -59,6 +75,14 @@ public class Juego extends JPanel implements MouseListener{
 	
 	//pintar tablero
 	
+	/**
+	 * Método sobrescrito de la clase <b>JPanel</b>.
+	 * <br>
+	 * Se encarga de pintar las fichas sobre el panel. La clase ficha está diseñada para 
+	 * "autopintarse", por eso se llama a .paint(Graphics , int , int) una vez por cada 
+	 * ficha de la matriz. Previamente se calcula la coordenada de la esquina superior izda
+	 * desde donde debe empezar a pintarse la ficha.
+	 */
 	protected void paintComponent(Graphics g) {
 		for(int i=0 ; i<fichas.length ; i++){//h
 			for(int j=0 ; j<fichas[0].length ; j++){//v
@@ -69,6 +93,18 @@ public class Juego extends JPanel implements MouseListener{
 		}
 	}
 	
+	/**
+	 * Dada una coordenada vertical devuelve la fila de fichas a la que corresponde o 
+	 * Excepcion si no corresponde con ninguna fila (por ejemplo si la coordenada es del
+	 * espacio que separa una fila de otra).<br>
+	 * Funciona dinámicamente en base a las constantes privadas de la clase, por lo que
+	 * no es necesario modificar este método para mantenerlo operativo si se modifican los
+	 * tamaños del programa.
+	 * 
+	 * @param y coordenada vertical en pixeles
+	 * @return <b>fila</b> Fila de una hipotética matriz de fichas
+	 * @throws GameException Si la la coordenada no corresponde con ninguna fila
+	 */
 	private int getFila(int y) throws GameException{
 		//v es el numero de filas de que se compone el tablero
 		for(int i=0 ; i<v ; i++){
@@ -79,6 +115,18 @@ public class Juego extends JPanel implements MouseListener{
 		throw new GameException("No has seleccionado ninguna fila");
 	}
 	
+	/**
+	 * Dada una coordenada horizontal devuelve la columna de fichas a la que corresponde o 
+	 * Excepcion si no corresponde con ninguna columna (por ejemplo si la coordenada es del
+	 * espacio que separa una columna de otra).<br>
+	 * Funciona dinámicamente en base a las constantes privadas de la clase, por lo que
+	 * no es necesario modificar este método para mantenerlo operativo si se modifican los
+	 * tamaños del programa.
+	 * 
+	 * @param x coordenada horizontal en pixeles
+	 * @return <b>columna</b> Columna de una hipotética matriz de fichas
+	 * @throws GameException Si la coordenada no corresponde con ninguna columna
+	 */
 	private int getColumna(int x) throws GameException{
 		//v es el numero de filas de que se compone el tablero
 		for(int i=0 ; i<h ; i++){
@@ -89,6 +137,17 @@ public class Juego extends JPanel implements MouseListener{
 		throw new GameException("No has seleccionado ninguna columna");
 	}
 	
+	/**
+	 * Este metodo determina si una ficha se puede o no mover, para ello comprueba sobre la 
+	 * matriz de fichas si la ficha seleccionada tiene en su misma fila y columna (se 
+	 * verifican ambas) la ficha con el codigo "0", asociada al espacio vacío. 
+	 * Solo si se diera esta condición, la ficha podría moverse, en caso contrario, la ficha 
+	 * estaría rodeada y bloqueada por otras.
+	 * 
+	 * @param fila de la ficha a evaluar
+	 * @param columna de la ficha a evaluar
+	 * @return true|false si se puede o no mover respectivamente
+	 */
 	private boolean fichaMovible(int fila, int columna){
 		for(int i=0 ; i<v ; i++){//busco la ficha 0 en la columna de la ficha elegida
 			if(fichas[columna][i].getCodigo()==0){
@@ -103,6 +162,16 @@ public class Juego extends JPanel implements MouseListener{
 		return false;
 	}
 	
+	/**
+	 * Desplaza la ficha seleccionada un hueco hacia el espacio en blanco, arrastrando a otras
+	 * fichas cuando sea necesario. 
+	 * Solo requiere la posicion de la ficha a mover, internamente evalúa si ésta se puede o no
+	 * mover y en caso afirmativo, es capaz de decidir el sentido y longitud del desplazamiento.
+	 * Por último, este método actualiza los movimientos realizados y comprueba si el juego ha 
+	 * finalizado (si se ordenó la última ficha)
+	 * @param fila de la ficha que se desea mover
+	 * @param columna de la ficha que se desea mover
+	 */
 	private void moverFicha(int fila, int columna){
 		int filaFichaVacia=-1;
 		int columnaFichaVacia=-1;
@@ -146,6 +215,14 @@ public class Juego extends JPanel implements MouseListener{
 		}
 	}
 	
+	/**
+	 * Metodo que comprueba el final del juego, para ello analiza la matriz elemento a elemento
+	 * comprobando si en cada caso la ficha es la que corresponde a esa posición.
+	 * A la ficha con el código 0 le corresponde la última posición y no la primera por ser
+	 * interpretada como la ficha vacía.
+	 * En caso de ganar muestra las estadísticas del juego en un mensaje informativo (tiempo y
+	 * movimientos) y al cerrar el mensaje reinicia tanto el juego como el panel informativo.
+	 */
 	private void comprobarVictoria(){
 		int fichaEsperada=1;
 		boolean victoria=true;
@@ -175,6 +252,14 @@ public class Juego extends JPanel implements MouseListener{
     public void mouseReleased(MouseEvent e) {}
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
+    /**
+     * Método sobreescrito de la intefaz MouseListener para recoger los clic que hace el usuario en 
+     * el juego. Este método es el motor del juego ya que todos los eventos relacionados con las 
+     * fichas se desencadenan a partir de la ejecución de este método.
+     * 
+     * Hace uso de una excepción GameException para controlar la posibilidad de que el usuario haga
+     * clic fuera de una casilla.
+     */
     public void mouseClicked(MouseEvent e) {
     	try{
     		int columna = getColumna(e.getX());
@@ -188,10 +273,19 @@ public class Juego extends JPanel implements MouseListener{
     	}
     }
     
+    /**
+     * Setter del objeto de la clase Contador, necesario para actualizar la información de los 
+     * movimientos y reiniciarlo cuando termina la partida
+     * @param c objeto de la clase Contador asociado al juego
+     */
     public void setContador(Contador c){
     	this.c = c;
     }
     
+    /**
+     * Método que facilita la reinicialización del juego, está pensado para ser llamado desde otras
+     * clases.
+     */
     public void reset(){
     	iniciarFichas();
     	this.repaint();
