@@ -2,7 +2,16 @@ import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 
-
+/**
+ * Clase ejecutable y principal del juego, es aquí donde se puede configurar el tamaño del tablero,
+ * que no tiene que ser necesariamente cuadrado, es decir, podemos generar un tablero de 10 columnas
+ * y tan solo 2 filas (  <em>Juego(10,2)</em>  ). Tambien se pueden configurar otros aspectos importantes
+ * relativos a la ventana de juego y la posición de sus elementos, pero se recomienda dejar tal cual
+ * se muestra
+ * 
+ * @author Julián
+ *
+ */
 public class Juego_16 {
 	
 	public static void main(String[] arg){

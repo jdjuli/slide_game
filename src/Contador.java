@@ -7,7 +7,15 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
+/**
+ * Esta clase extiende de JPanel y sirve para mostrar una pequeña barra de información que muestre 
+ * el progreso del juego (número de movimientos realizados y tiempo transcurrido).
+ * Esta información deberá actualizarse a intervalos regulares (1seg o menos sería ideal), así como
+ * cada vez que el jugador mueva una ficha.
+ * 
+ * @author Julián
+ *
+ */
 public class Contador extends JPanel implements Runnable,ActionListener{
 	/**
 	 * Elemento que mostrará el tiempo transcurrido
@@ -53,9 +61,8 @@ public class Contador extends JPanel implements Runnable,ActionListener{
 	
 	public Contador(){
 		selfThread = new Thread(this);
-		selfThread.start();
-		tiempo = new JLabel("hola");
-		movimientos = new JLabel("mundo");
+		tiempo = new JLabel("00m 00s");
+		movimientos = new JLabel("0");
 		reset = new JButton("Reiniciar");
 		JPanel resetPane = new JPanel();
 		resetPane.add(reset);
@@ -65,6 +72,7 @@ public class Contador extends JPanel implements Runnable,ActionListener{
 		this.add(resetPane,BorderLayout.CENTER);
 		this.add(movimientos,BorderLayout.EAST);
 		this.setPreferredSize(new Dimension( 0 , 35) );
+		selfThread.start();
 	}
 	
 	/**
@@ -141,9 +149,12 @@ public class Contador extends JPanel implements Runnable,ActionListener{
 	 * Método que facilita la reinicialización del panel
 	 */
 	public void reset(){
+		tiempo.setText("00m 00s");
+		movimientos.setText("0");
 		num_movimientos = 0;
 		segundos = 0;
 		minutos = 0;
+		
 	}
 	
 	/**
